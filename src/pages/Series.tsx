@@ -81,7 +81,7 @@ export default function Series() {
             {/* Content Area */}
             <div className="relative z-10 w-full px-6 md:px-12 pb-20">
                 {/* Category Filter - Glass Bar */}
-                <div className="sticky top-20 z-30 mb-6 -mx-6 md:-mx-12 px-6 md:px-12 py-3 bg-[#030305]/80 backdrop-blur-xl border-y border-white/5">
+                <div className="mb-6 -mx-6 md:-mx-12 px-6 md:px-12 py-3 bg-transparent border-y border-white/5">
                     <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                         {categories.map((cat) => (
                             <button
