@@ -27,27 +27,26 @@ export default function EnhancedPlayer({ src, title, poster }: EnhancedPlayerPro
                 style={{ backgroundImage: `url(${poster || ''})`, backgroundSize: 'cover' }}
             />
 
-            {/* Controls Overlay */}
-            <div className="absolute top-4 right-4 z-20 flex flex-col gap-2 items-end pointer-events-none">
-                {/* Status Indicator */}
-                <div className={`px-3 py-1.5 rounded-full backdrop-blur-md border text-[10px] font-black flex items-center gap-1.5 shadow-lg transition-all ${isLocked
-                    ? 'bg-black/60 border-nova-accent/30 text-nova-accent shadow-nova-accent/10'
+            {/* Controls Overlay - Top Right Group */}
+            <div className="absolute top-4 right-4 z-50 flex items-center gap-2 pointer-events-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+
+                {/* Status Indicator (Compact) */}
+                <div className={`h-8 px-3 rounded-full backdrop-blur-md border text-[10px] font-black flex items-center gap-1.5 shadow-lg select-none ${isLocked
+                    ? 'bg-black/60 border-nova-accent/30 text-nova-accent'
                     : 'bg-yellow-500/10 border-yellow-500/30 text-yellow-500'
                     }`}>
                     <i className={isLocked ? "ri-shield-check-fill" : "ri-shield-keyhole-line"}></i>
-                    {isLocked ? "AD-BLOCK ACTIVE" : "ADS UNLOCKED"}
+                    <span>{isLocked ? "SECURE" : "UNLOCKED"}</span>
                 </div>
-            </div>
 
-            {/* Unlock Switch - Visible on Hover or if stream might be broken */}
-            <div className="absolute bottom-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                {/* Unlock Toggle Button (Minimalist) */}
                 <button
                     onClick={() => setIsLocked(!isLocked)}
-                    className="pointer-events-auto flex items-center gap-2 px-3 py-2 bg-black/80 backdrop-blur-md border border-white/10 hover:bg-white/10 rounded-xl text-xs font-bold text-white transition-all hover:scale-105 active:scale-95"
-                    title={isLocked ? "Click if video doesn't load" : "Click to block ads again"}
+                    className="h-8 px-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full text-white text-xs font-bold transition-all flex items-center gap-2"
+                    title={isLocked ? "Video issues? Click to unlock" : "Restore protection"}
                 >
-                    <i className={isLocked ? "ri-lock-unlock-line" : "ri-lock-fill"}></i>
-                    {isLocked ? "Video not loading? Unlock" : "Restore Ad-Block"}
+                    <i className={isLocked ? "ri-tools-fill" : "ri-lock-fill"}></i>
+                    <span className="hidden group-hover:inline">{isLocked ? "Fix Video" : "Restore"}</span>
                 </button>
             </div>
         </div>
