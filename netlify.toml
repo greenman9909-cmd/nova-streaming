@@ -1,0 +1,16 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Proxy Sports API to streamed.pk
+[[redirects]]
+  from = "/api/sports/*"
+  to = "https://streamed.pk/api/:splat"
+  status = 200
+  force = true
+
+# SPA Redirect (Must be last)
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
