@@ -5,7 +5,8 @@ import DynamicHeroBanner from '../components/DynamicHeroBanner';
 import NovaLogo from '../components/NovaLogo';
 import PremiumLoader from '../components/PremiumLoader';
 import { getHomePage, animeToContent } from '../services/animeService';
-getTrendingMovies,
+import {
+    getTrendingMovies,
     getTrendingSeries,
     getTopRatedMovies,
     getNowPlayingMovies,
