@@ -27,5 +27,10 @@
         {
             "path": "./tsconfig.node.json"
         }
+    ],
+    "exclude": [
+        "server",
+        "api",
+        "node_modules"
     ]
 }
