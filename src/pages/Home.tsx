@@ -5,9 +5,13 @@ import DynamicHeroBanner from '../components/DynamicHeroBanner';
 import NovaLogo from '../components/NovaLogo';
 import PremiumLoader from '../components/PremiumLoader';
 import { getHomePage, animeToContent } from '../services/animeService';
-import {
-    getTrendingMovies,
+getTrendingMovies,
     getTrendingSeries,
+    getTopRatedMovies,
+    getNowPlayingMovies,
+    getTopRatedSeries,
+    getPopularSeries,
+    getMoviesByGenre,
     getImageUrl,
     TMDBMovie,
     TMDBSeries
@@ -53,7 +57,12 @@ export default function Home() {
     const [popularAnime, setPopularAnime] = useState<any[]>([]);
     const [latestAnime, setLatestAnime] = useState<any[]>([]);
     const [trendingMovies, setTrendingMovies] = useState<any[]>([]);
+    const [topRatedMovies, setTopRatedMovies] = useState<any[]>([]);
+    const [nowPlayingMovies, setNowPlayingMovies] = useState<any[]>([]);
+    const [actionMovies, setActionMovies] = useState<any[]>([]);
     const [trendingSeries, setTrendingSeries] = useState<any[]>([]);
+    const [topRatedSeries, setTopRatedSeries] = useState<any[]>([]);
+    const [popularSeries, setPopularSeries] = useState<any[]>([]);
     const [liveSports, setLiveSports] = useState<any[]>([]);
     const [heroItems, setHeroItems] = useState<(TMDBMovie | TMDBSeries)[]>([]);
     const [activeCategory, setActiveCategory] = useState('all');
@@ -64,11 +73,26 @@ export default function Home() {
             setIsLoading(true);
             try {
                 // Fetch all data in parallel but handle failures individually
-                const [animeResult, moviesResult, seriesResult, sportsResult] = await Promise.allSettled([
+                const [
+                    animeResult,
+                    moviesResult,
+                    seriesResult,
+                    sportsResult,
+                    topRatedMoviesRes,
+                    nowPlayingMoviesRes,
+                    topRatedSeriesRes,
+                    popularSeriesRes,
+                    actionMoviesRes
+                ] = await Promise.allSettled([
                     getHomePage(),
                     getTrendingMovies(),
                     getTrendingSeries(),
-                    getLiveMatches()
+                    getLiveMatches(),
+                    getTopRatedMovies(),
+                    getNowPlayingMovies(),
+                    getTopRatedSeries(),
+                    getPopularSeries(),
+                    getMoviesByGenre(28) // Action Movies
                 ]);
 
                 // Handle Anime Data
@@ -84,15 +108,26 @@ export default function Home() {
                 // Handle Movies Data
                 if (moviesResult.status === 'fulfilled' && Array.isArray(moviesResult.value)) {
                     setTrendingMovies(moviesResult.value.slice(0, 10).map(movieToContent));
-                } else {
-                    console.error("Movies fetch failed", moviesResult.status === 'rejected' ? moviesResult.reason : 'Invalid data');
+                }
+                if (topRatedMoviesRes.status === 'fulfilled' && Array.isArray(topRatedMoviesRes.value)) {
+                    setTopRatedMovies(topRatedMoviesRes.value.slice(0, 10).map(movieToContent));
+                }
+                if (nowPlayingMoviesRes.status === 'fulfilled' && Array.isArray(nowPlayingMoviesRes.value)) {
+                    setNowPlayingMovies(nowPlayingMoviesRes.value.slice(0, 10).map(movieToContent));
+                }
+                if (actionMoviesRes.status === 'fulfilled' && Array.isArray(actionMoviesRes.value)) {
+                    setActionMovies(actionMoviesRes.value.slice(0, 10).map(movieToContent));
                 }
 
                 // Handle Series Data
                 if (seriesResult.status === 'fulfilled' && Array.isArray(seriesResult.value)) {
                     setTrendingSeries(seriesResult.value.slice(0, 10).map(seriesToContent));
-                } else {
-                    console.error("Series fetch failed", seriesResult.status === 'rejected' ? seriesResult.reason : 'Invalid data');
+                }
+                if (topRatedSeriesRes.status === 'fulfilled' && Array.isArray(topRatedSeriesRes.value)) {
+                    setTopRatedSeries(topRatedSeriesRes.value.slice(0, 10).map(seriesToContent));
+                }
+                if (popularSeriesRes.status === 'fulfilled' && Array.isArray(popularSeriesRes.value)) {
+                    setPopularSeries(popularSeriesRes.value.slice(0, 10).map(seriesToContent));
                 }
 
                 // Handle Hero Items (Movies + Series)
@@ -167,7 +202,7 @@ export default function Home() {
                     />
                 )}
 
-                {/* Featured Movies */}
+                {/* Featured Movies - Trending */}
                 {(activeCategory === 'all' || activeCategory === 'movies') && trendingMovies.length > 0 && (
                     <ContentRow
                         title="Featured Movies"
@@ -177,7 +212,37 @@ export default function Home() {
                     />
                 )}
 
-                {/* Premium Series */}
+                {/* Now Playing Movies */}
+                {(activeCategory === 'all' || activeCategory === 'movies') && nowPlayingMovies.length > 0 && (
+                    <ContentRow
+                        title="Now in Cinemas"
+                        items={nowPlayingMovies}
+                        seeAllLink="/peliculas"
+                        getLink={(item) => `/watch/movie/${item.id}`}
+                    />
+                )}
+
+                {/* Top Rated Movies */}
+                {(activeCategory === 'all' || activeCategory === 'movies') && topRatedMovies.length > 0 && (
+                    <ContentRow
+                        title="Critically Acclaimed Movies"
+                        items={topRatedMovies}
+                        seeAllLink="/peliculas"
+                        getLink={(item) => `/watch/movie/${item.id}`}
+                    />
+                )}
+
+                {/* Action Movies */}
+                {(activeCategory === 'all' || activeCategory === 'movies') && actionMovies.length > 0 && (
+                    <ContentRow
+                        title="Adrenaline Rush"
+                        items={actionMovies}
+                        seeAllLink="/peliculas"
+                        getLink={(item) => `/watch/movie/${item.id}`}
+                    />
+                )}
+
+                {/* Premium Series - Trending */}
                 {(activeCategory === 'all' || activeCategory === 'series') && trendingSeries.length > 0 && (
                     <ContentRow
                         title="Premium Series"
@@ -188,10 +253,30 @@ export default function Home() {
                     />
                 )}
 
+                {/* Top Rated Series */}
+                {(activeCategory === 'all' || activeCategory === 'series') && topRatedSeries.length > 0 && (
+                    <ContentRow
+                        title="All-Time Best Series"
+                        items={topRatedSeries}
+                        seeAllLink="/series"
+                        getLink={(item) => `/watch/tv/${item.id}`}
+                    />
+                )}
+
+                {/* Popular Series */}
+                {(activeCategory === 'all' || activeCategory === 'series') && popularSeries.length > 0 && (
+                    <ContentRow
+                        title="Most Watched Shows"
+                        items={popularSeries}
+                        seeAllLink="/series"
+                        getLink={(item) => `/watch/tv/${item.id}`}
+                    />
+                )}
+
                 {/* Latest Episodes */}
                 {(activeCategory === 'all' || activeCategory === 'anime') && latestAnime.length > 0 && (
                     <ContentRow
-                        title="New Episodes"
+                        title="New Anime Episodes"
                         items={latestAnime}
                         seeAllLink="/anime"
                         getLink={(item) => `/anime/watch/${item.id}`}
