@@ -188,37 +188,17 @@ export const getMatchesBySport = async (sport: string): Promise<Match[]> => {
 /**
  * Get stream links for a specific match source (Mock)
  */
-export const getStreams = async (_source: string, id: string): Promise<Stream[]> => {
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Return appropriate highlights based on ID context (mock logic)
-    let embedUrl = 'https://www.youtube.com/embed/k5k4r33j_Xo?autoplay=1&mute=1'; // Default Sports Highlight
-
-    if (id.includes('rm-vs-barca')) embedUrl = 'https://www.youtube.com/embed/k5k4r33j_Xo?autoplay=1&mute=1'; // El Clasico
-    if (id.includes('lakers')) embedUrl = 'https://www.youtube.com/embed/Pj1e0k2m9k8?autoplay=1&mute=1'; // NBA
-    if (id.includes('f1')) embedUrl = 'https://www.youtube.com/embed/6Xv7-kX_vE8?autoplay=1&mute=1'; // F1
-    if (id.includes('ufc')) embedUrl = 'https://www.youtube.com/embed/e_j6O4p-vJk?autoplay=1&mute=1'; // UFC
-    if (id.includes('mancity-arsenal')) embedUrl = 'https://www.youtube.com/embed/4q6u9k8?autoplay=1&mute=1'; // Man City vs Arsenal (Placeholder ID)
-    if (id.includes('psg-om')) embedUrl = 'https://www.youtube.com/embed/HuK7_s7?autoplay=1&mute=1'; // PSG vs OM (Placeholder ID)
-
-    return [
-        {
-            id: 'stream-1',
-            streamNo: 1,
-            language: 'English',
-            hd: true,
-            embedUrl: embedUrl,
-            source: 'mock'
-        },
-        {
-            id: 'stream-2',
-            streamNo: 2,
-            language: 'Spanish',
-            hd: true,
-            embedUrl: embedUrl, // Same for mock
-            source: 'mock'
-        }
-    ];
+/**
+ * Get stream links for a specific match source
+ */
+export const getStreams = async (source: string, id: string): Promise<Stream[]> => {
+    try {
+        const response = await streamedApi.get(`/stream/${source}/${id}`);
+        return response.data || [];
+    } catch (error) {
+        console.error('Error fetching streams:', error);
+        return [];
+    }
 };
 
 /**
