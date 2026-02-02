@@ -1,3 +1,9 @@
+interface EnhancedPlayerProps {
+    src: string;
+    title: string;
+    poster?: string | null | undefined;
+}
+
 export default function EnhancedPlayer({ src, title, poster }: EnhancedPlayerProps) {
 
     return (
