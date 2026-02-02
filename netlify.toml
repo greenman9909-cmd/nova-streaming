@@ -1,15 +1,13 @@
 [build]
-  command = "npm run build"
   publish = "dist"
+  command = "npm run build"
 
-# Proxy Sports API to streamed.pk
 [[redirects]]
-  from = "/api/sports/*"
-  to = "https://streamed.pk/api/:splat"
+  from = "/api/*"
+  to = "https://nova-backhend-rmye.vercel.app/api/:splat"
   status = 200
   force = true
 
-# SPA Redirect (Must be last)
 [[redirects]]
   from = "/*"
   to = "/index.html"
