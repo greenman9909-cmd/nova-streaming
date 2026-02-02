@@ -22,8 +22,8 @@ const DynamicHeroBanner: React.FC<DynamicHeroBannerProps> = ({ items }) => {
     const autoPlayRef = useRef<NodeJS.Timeout | null>(null);
 
     const currentItem = items[currentIndex];
-    const isMovie = currentItem ? 'title' in currentItem : false;
-    const title = currentItem ? ('title' in currentItem ? currentItem.title : (currentItem as TMDBSeries).name) : '';
+    const isMovie = currentItem ? ('title' in currentItem && !('name' in currentItem)) : false;
+    const title = currentItem ? ('name' in currentItem ? (currentItem as TMDBSeries).name : (currentItem as TMDBMovie).title) : '';
 
     // Auto-advance carousel
     useEffect(() => {
@@ -143,13 +143,7 @@ const DynamicHeroBanner: React.FC<DynamicHeroBannerProps> = ({ items }) => {
                             if (isMovie) {
                                 navigate(`/watch/movie/${currentItem.id}`);
                             } else {
-                                // Check if it's an Anime/Animation (Genre 16)
-                                const isAnime = currentItem.genre_ids?.includes(16);
-                                if (isAnime) {
-                                    navigate(`/anime/watch/${currentItem.id}`);
-                                } else {
-                                    navigate(`/watch/tv/${currentItem.id}`);
-                                }
+                                navigate(`/watch/tv/${currentItem.id}`);
                             }
                         }}
                         className="flex items-center gap-2 px-6 py-3 bg-white hover:bg-white/90 text-black rounded-md font-semibold text-[15px] transition-all shadow-lg"
