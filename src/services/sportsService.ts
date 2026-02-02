@@ -198,6 +198,8 @@ export const getStreams = async (source: string, id: string): Promise<Stream[]> 
     if (id.includes('lakers')) embedUrl = 'https://www.youtube.com/embed/Pj1e0k2m9k8?autoplay=1&mute=1'; // NBA
     if (id.includes('f1')) embedUrl = 'https://www.youtube.com/embed/6Xv7-kX_vE8?autoplay=1&mute=1'; // F1
     if (id.includes('ufc')) embedUrl = 'https://www.youtube.com/embed/e_j6O4p-vJk?autoplay=1&mute=1'; // UFC
+    if (id.includes('mancity-arsenal')) embedUrl = 'https://www.youtube.com/embed/4q6u9k8?autoplay=1&mute=1'; // Man City vs Arsenal (Placeholder ID)
+    if (id.includes('psg-om')) embedUrl = 'https://www.youtube.com/embed/HuK7_s7?autoplay=1&mute=1'; // PSG vs OM (Placeholder ID)
 
     return [
         {
