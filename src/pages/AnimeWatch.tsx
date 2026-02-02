@@ -19,7 +19,7 @@ export default function AnimeWatch() {
     const [episodes, setEpisodes] = useState<Episode[]>([]);
     const [currentEpisode, setCurrentEpisode] = useState<Episode | null>(null);
     const [servers, setServers] = useState<Server[]>([]);
-    const [currentServer, setCurrentServer] = useState<string>('hd-1');
+    const [currentServer, setCurrentServer] = useState<string>('vidcloud');
     const [streamUrl, setStreamUrl] = useState<string>('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -70,9 +70,8 @@ export default function AnimeWatch() {
                 const streamData = await getStreamUrl(currentEpisode.id, currentServer, 'sub');
 
                 if (streamData?.results?.streamingLink?.link?.file) {
-                    // If HLS
-                    const file = streamData.results.streamingLink.link.file;
-                    setStreamUrl(`https://plyr.link/p/player.html#${btoa(file)}`);
+                    // Direct HLS
+                    setStreamUrl(streamData.results.streamingLink.link.file);
                 } else if (streamData?.results?.streamingLink?.iframe) {
                     setStreamUrl(streamData.results.streamingLink.iframe);
                 } else {
