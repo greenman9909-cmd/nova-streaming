@@ -14,9 +14,13 @@ interface ContentCardProps {
     isLive?: boolean;
     tmdbId?: number;
     mediaType?: 'movie' | 'tv';
+    teams?: {
+        home?: { name: string; badge?: string };
+        away?: { name: string; badge?: string };
+    };
 }
 
-export default function ContentCard({ id, title, image, rating, type, year, link, badge, isLive, tmdbId, mediaType }: ContentCardProps) {
+export default function ContentCard({ id, title, image, rating, type, year, link, badge, isLive, tmdbId, mediaType, teams }: ContentCardProps) {
     const [imgError, setImgError] = useState(false);
     const [isHovered, setIsHovered] = useState(false);
     const [trailerKey, setTrailerKey] = useState<string | null>(null);
@@ -66,124 +70,183 @@ export default function ContentCard({ id, title, image, rating, type, year, link
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={handleMouseLeave}
         >
-            <div className="relative aspect-[2/3] rounded-xl overflow-hidden mb-2 bg-gray-900 transition-all duration-300 group-hover:transform group-hover:scale-105 group-hover:shadow-[0_0_25px_rgba(139,92,246,0.4)] z-0">
+            {/* Special Sports Layout - Horizontal Card */}
+            {type === 'Sports' && teams ? (
+                <div className="relative aspect-video w-64 md:w-80 rounded-xl overflow-hidden mb-2 bg-[#0F0F13] transition-all duration-300 group-hover:transform group-hover:scale-105 group-hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] z-0 border border-white/5 group-hover:border-emerald-500/50">
 
-                {/* Holographic Sheen Layer */}
-                <div className="absolute inset-0 z-10 opacity-0 group-hover:opacity-30 pointer-events-none bg-gradient-to-tr from-transparent via-white to-transparent -translate-x-full group-hover:animate-holographic"></div>
-
-                {/* Border Glow - Purple on hover */}
-                <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-violet-500/50 transition-colors z-20"></div>
-
-                {/* Image */}
-                {!imgError ? (
-                    <img
-                        src={image}
-                        alt={title}
-                        className={`w-full h-full object-cover transition-all duration-700 ${isHovered ? 'scale-110' : 'scale-100'} ${trailerLoaded ? 'opacity-0' : 'opacity-100'}`}
-                        loading="lazy"
-                        onError={() => setImgError(true)}
-                    />
-                ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800 text-gray-500 p-3 text-center">
-                        <i className="ri-film-line text-3xl mb-2"></i>
-                        <span className="text-[10px] font-medium line-clamp-2">{title}</span>
-                    </div>
-                )}
-
-                {/* Trailer Video - Plays on hover after delay */}
-                {isHovered && trailerKey && (
-                    <div className={`absolute inset-0 z-5 transition-opacity duration-500 ${trailerLoaded ? 'opacity-100' : 'opacity-0'}`}>
-                        <iframe
-                            src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=${trailerKey}&start=5&vq=hd1080`}
-                            className="w-full h-full object-cover scale-150"
-                            allow="autoplay; encrypted-media"
-                            allowFullScreen
-                            onLoad={() => setTrailerLoaded(true)}
-                            style={{ border: 'none', pointerEvents: 'none' }}
-                        />
-                    </div>
-                )}
-
-                {/* Hover Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'} z-10`} />
-
-                {/* Live Badge */}
-                {isLive && (
-                    <div className="absolute top-2 left-2 flex items-center gap-1 z-30 px-2 py-0.5 rounded bg-red-600/90 backdrop-blur text-white text-[10px] font-bold shadow-lg shadow-red-500/20">
-                        <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                        LIVE
-                    </div>
-                )}
-
-                {/* Badge */}
-                {badge && !isLive && (
-                    <div className={`absolute top-2 left-2 z-30 px-2 py-0.5 rounded bg-violet-600/90 backdrop-blur text-white text-[10px] font-bold shadow-lg shadow-violet-500/20 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-                        {badge}
-                    </div>
-                )}
-
-                {/* NOVA+ Badge - Prime Video Style */}
-                <div className="absolute bottom-3 right-3 z-30 flex items-center gap-1 opacity-90">
-                    <div className="flex items-center gap-0.5 text-[#00a8e1]">
-                        <span className="text-[10px] font-black tracking-tight">nova</span>
-                        <span className="text-[10px] font-black text-white">+</span>
-                    </div>
-                </div>
-
-                {/* Rating */}
-                {rating && (
-                    <div className={`absolute top-2 right-2 z-30 flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur border border-white/10 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-                        <i className="ri-star-fill text-amber-400 text-[10px]"></i>
-                        <span className="text-white text-[10px] font-bold">{(rating * 10).toFixed(0)}%</span>
-                    </div>
-                )}
-
-                {/* Play Button - Neon Style */}
-                <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 z-30 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
-                    <div className={`w-14 h-14 rounded-full bg-violet-500/30 backdrop-blur-md border-2 border-white/60 flex items-center justify-center shadow-[0_0_25px_rgba(139,92,246,0.5)] transition-transform duration-300 group-hover:scale-110`}>
-                        <i className="ri-play-fill text-white text-3xl ml-1"></i>
-                    </div>
-                </div>
-
-                {/* Loading Trailer Indicator */}
-                {isHovered && trailerKey && !trailerLoaded && (
-                    <div className="absolute inset-0 flex items-center justify-center z-25">
-                        <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
-                    </div>
-                )}
-
-                {/* Bottom Actions */}
-                <div className={`absolute bottom-0 left-0 right-0 p-2 z-30 flex items-center justify-center gap-2 transition-all duration-300 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                    <button
-                        onClick={(e) => { e.preventDefault(); }}
-                        className="w-8 h-8 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white hover:bg-violet-500 hover:border-violet-400 hover:shadow-[0_0_10px_rgba(139,92,246,0.4)] transition-all"
-                    >
-                        <i className="ri-add-line text-lg"></i>
-                    </button>
-                    <button
-                        onClick={(e) => { e.preventDefault(); }}
-                        className="w-8 h-8 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white hover:bg-pink-500 hover:border-pink-400 hover:shadow-[0_0_10px_rgba(236,72,153,0.4)] transition-all"
-                    >
-                        <i className="ri-heart-line text-lg"></i>
-                    </button>
-                </div>
-            </div>
-
-            {/* Title & Info - Compact */}
-            <div>
-                <h3 className={`font-medium text-xs line-clamp-1 transition-colors duration-300 ${isHovered ? 'text-white' : 'text-gray-300'}`}>
-                    {title}
-                </h3>
-                <div className="flex items-center gap-1.5 mt-0.5 text-gray-500 text-[10px]">
-                    {year && <span>{year}</span>}
-                    {type && (
-                        <>
-                            <span>•</span>
-                            <span>{type}</span>
-                        </>
+                    {/* Live Badge */}
+                    {isLive && (
+                        <div className="absolute top-3 left-3 flex items-center gap-1.5 z-30 px-2 py-0.5 rounded bg-red-600 text-white text-[10px] font-bold shadow-lg shadow-red-600/20 animate-pulse">
+                            <span className="w-1.5 h-1.5 bg-white rounded-full" />
+                            LIVE
+                        </div>
                     )}
+
+                    {/* Background Gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/40 to-black z-0" />
+                    <div className="absolute inset-0 bg-black/40 z-0" />
+
+                    {/* VS Content */}
+                    <div className="absolute inset-0 z-10 flex items-center justify-between px-6">
+                        {/* Home Team */}
+                        <div className="flex flex-col items-center gap-2 w-1/3">
+                            <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/10 p-2 flex items-center justify-center backdrop-blur-sm border border-white/10">
+                                {teams.home?.badge ? (
+                                    <img src={`/api/sports/images/badge/${teams.home.badge}.webp`} alt={teams.home.name} className="w-full h-full object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
+                                ) : (
+                                    <span className="text-xl font-bold text-white">{teams.home?.name?.[0]}</span>
+                                )}
+                            </div>
+                            <span className="text-[10px] md:text-xs font-bold text-white text-center leading-tight line-clamp-2">{teams.home?.name || 'Home'}</span>
+                        </div>
+
+                        {/* VS */}
+                        <div className="flex flex-col items-center justify-center">
+                            <span className="text-xl md:text-2xl font-black italic text-white/20">VS</span>
+                            {isLive && <span className="text-[10px] text-emerald-400 font-mono mt-1">45:00</span>}
+                        </div>
+
+                        {/* Away Team */}
+                        <div className="flex flex-col items-center gap-2 w-1/3">
+                            <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-white/10 p-2 flex items-center justify-center backdrop-blur-sm border border-white/10">
+                                {teams.away?.badge ? (
+                                    <img src={`/api/sports/images/badge/${teams.away.badge}.webp`} alt={teams.away.name} className="w-full h-full object-contain" onError={(e) => e.currentTarget.style.display = 'none'} />
+                                ) : (
+                                    <span className="text-xl font-bold text-white">{teams.away?.name?.[0]}</span>
+                                )}
+                            </div>
+                            <span className="text-[10px] md:text-xs font-bold text-white text-center leading-tight line-clamp-2">{teams.away?.name || 'Away'}</span>
+                        </div>
+                    </div>
+
+                    {/* Hover Overlay */}
+                    <div className={`absolute inset-0 bg-black/60 flex items-center justify-center transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'} z-20`}>
+                        <div className="w-12 h-12 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/50">
+                            <i className="ri-play-fill text-white text-2xl ml-1"></i>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            ) : (
+                <div className="relative aspect-[2/3] rounded-xl overflow-hidden mb-2 bg-gray-900 transition-all duration-300 group-hover:transform group-hover:scale-105 group-hover:shadow-[0_0_25px_rgba(139,92,246,0.4)] z-0">
+
+                    {/* Holographic Sheen Layer */}
+                    <div className="absolute inset-0 z-10 opacity-0 group-hover:opacity-30 pointer-events-none bg-gradient-to-tr from-transparent via-white to-transparent -translate-x-full group-hover:animate-holographic"></div>
+
+                    {/* Border Glow - Purple on hover */}
+                    <div className="absolute inset-0 rounded-xl border-2 border-transparent group-hover:border-violet-500/50 transition-colors z-20"></div>
+
+                    {/* Image */}
+                    {!imgError ? (
+                        <img
+                            src={image}
+                            alt={title}
+                            className={`w-full h-full object-cover transition-all duration-700 ${isHovered ? 'scale-110' : 'scale-100'} ${trailerLoaded ? 'opacity-0' : 'opacity-100'}`}
+                            loading="lazy"
+                            onError={() => setImgError(true)}
+                        />
+                    ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-gray-800 text-gray-500 p-3 text-center">
+                            <i className="ri-film-line text-3xl mb-2"></i>
+                            <span className="text-[10px] font-medium line-clamp-2">{title}</span>
+                        </div>
+                    )}
+
+                    {/* Trailer Video - Plays on hover after delay */}
+                    {isHovered && trailerKey && (
+                        <div className={`absolute inset-0 z-5 transition-opacity duration-500 ${trailerLoaded ? 'opacity-100' : 'opacity-0'}`}>
+                            <iframe
+                                src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=1&controls=0&showinfo=0&rel=0&modestbranding=1&loop=1&playlist=${trailerKey}&start=5&vq=hd1080`}
+                                className="w-full h-full object-cover scale-150"
+                                allow="autoplay; encrypted-media"
+                                allowFullScreen
+                                onLoad={() => setTrailerLoaded(true)}
+                                style={{ border: 'none', pointerEvents: 'none' }}
+                            />
+                        </div>
+                    )}
+
+                    {/* Hover Overlay */}
+                    <div className={`absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent transition-opacity duration-300 ${isHovered ? 'opacity-100' : 'opacity-0'} z-10`} />
+
+                    {/* Live Badge */}
+                    {isLive && (
+                        <div className="absolute top-2 left-2 flex items-center gap-1 z-30 px-2 py-0.5 rounded bg-red-600/90 backdrop-blur text-white text-[10px] font-bold shadow-lg shadow-red-500/20">
+                            <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                            LIVE
+                        </div>
+                    )}
+
+                    {/* Badge */}
+                    {badge && !isLive && (
+                        <div className={`absolute top-2 left-2 z-30 px-2 py-0.5 rounded bg-violet-600/90 backdrop-blur text-white text-[10px] font-bold shadow-lg shadow-violet-500/20 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+                            {badge}
+                        </div>
+                    )}
+
+                    {/* NOVA+ Badge - Prime Video Style */}
+                    <div className="absolute bottom-3 right-3 z-30 flex items-center gap-1 opacity-90">
+                        <div className="flex items-center gap-0.5 text-[#00a8e1]">
+                            <span className="text-[10px] font-black tracking-tight">nova</span>
+                            <span className="text-[10px] font-black text-white">+</span>
+                        </div>
+                    </div>
+
+                    {/* Rating */}
+                    {rating && (
+                        <div className={`absolute top-2 right-2 z-30 flex items-center gap-1 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur border border-white/10 transition-opacity ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+                            <i className="ri-star-fill text-amber-400 text-[10px]"></i>
+                            <span className="text-white text-[10px] font-bold">{(rating * 10).toFixed(0)}%</span>
+                        </div>
+                    )}
+
+                    {/* Play Button - Neon Style */}
+                    <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300 z-30 ${isHovered ? 'opacity-100' : 'opacity-0'}`}>
+                        <div className={`w-14 h-14 rounded-full bg-violet-500/30 backdrop-blur-md border-2 border-white/60 flex items-center justify-center shadow-[0_0_25px_rgba(139,92,246,0.5)] transition-transform duration-300 group-hover:scale-110`}>
+                            <i className="ri-play-fill text-white text-3xl ml-1"></i>
+                        </div>
+                    </div>
+
+                    {/* Loading Trailer Indicator */}
+                    {isHovered && trailerKey && !trailerLoaded && (
+                        <div className="absolute inset-0 flex items-center justify-center z-25">
+                            <div className="w-6 h-6 border-2 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+                        </div>
+                    )}
+
+                    {/* Bottom Actions */}
+                    <div className={`absolute bottom-0 left-0 right-0 p-2 z-30 flex items-center justify-center gap-2 transition-all duration-300 ${isHovered ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                        <button
+                            onClick={(e) => { e.preventDefault(); }}
+                            className="w-8 h-8 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white hover:bg-violet-500 hover:border-violet-400 hover:shadow-[0_0_10px_rgba(139,92,246,0.4)] transition-all"
+                        >
+                            <i className="ri-add-line text-lg"></i>
+                        </button>
+                        <button
+                            onClick={(e) => { e.preventDefault(); }}
+                            className="w-8 h-8 rounded-full bg-white/10 backdrop-blur border border-white/20 flex items-center justify-center text-white hover:bg-pink-500 hover:border-pink-400 hover:shadow-[0_0_10px_rgba(236,72,153,0.4)] transition-all"
+                        >
+                            <i className="ri-heart-line text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+            )}
+            {/* Title & Info - Compact */}
+            {type !== 'Sports' && (
+                <div>
+                    <h3 className={`font-medium text-xs line-clamp-1 transition-colors duration-300 ${isHovered ? 'text-white' : 'text-gray-300'}`}>
+                        {title}
+                    </h3>
+                    <div className="flex items-center gap-1.5 mt-0.5 text-gray-500 text-[10px]">
+                        {year && <span>{year}</span>}
+                        {type && (
+                            <>
+                                <span>•</span>
+                                <span>{type}</span>
+                            </>
+                        )}
+                    </div>
+                </div>
+            )}
         </Link>
     );
 }
