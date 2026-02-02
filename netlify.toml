@@ -4,7 +4,7 @@
 
 [[redirects]]
   from = "/api/*"
-  to = "https://nova-backhend-rmye.vercel.app/api/:splat"
+  to = "https://nova-backhend.vercel.app/api/:splat"
   status = 200
   force = true
 
