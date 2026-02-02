@@ -1,15 +1,7 @@
 import axios from 'axios';
 
-// Streamed.pk API Configuration
-// Streamed.pk API Configuration
-const STREAMED_BASE_URL = '/api/sports';
+// API Configuration (kept for image helpers, but logic is mocked)
 const STREAMED_IMAGE_BASE = '/api/sports/images';
-
-// Create Axios instance
-const streamedApi = axios.create({
-    baseURL: STREAMED_BASE_URL,
-    timeout: 10000,
-});
 
 // Types
 export interface MatchTeam {
@@ -53,21 +45,15 @@ export interface Sport {
 // Image URL helpers
 export const getTeamBadgeUrl = (badge: string | undefined): string => {
     if (!badge) return '';
-    return `${STREAMED_IMAGE_BASE}/badge/${badge}.webp`;
+    // Use a public placeholder or local asset if api proxy is not available
+    // For now, we can try to use a generic sports API or just return a placeholder
+    return `https://ui-avatars.com/api/?name=${badge}&background=random&color=fff&rounded=true&bold=true`;
 };
 
 export const getMatchPosterUrl = (poster: string | undefined, match?: Match): string => {
-    // If poster field is provided and starts with a path, use it directly
-    if (poster && poster.startsWith('/')) {
-        return `https://streamed.pk${poster}.webp`;
-    }
-    // Use proxy endpoint for poster ID
-    if (poster) {
-        return `${STREAMED_IMAGE_BASE}/proxy/${poster}.webp`;
-    }
     // Fallback: Try to construct from team badges if available
     if (match?.teams?.home?.badge && match?.teams?.away?.badge) {
-        return `${STREAMED_IMAGE_BASE}/poster/${match.teams.home.badge}/${match.teams.away.badge}.webp`;
+        return `https://ui-avatars.com/api/?name=${match.teams.home.name}+${match.teams.away.name}&background=0D0D11&color=fff&size=500`;
     }
     // Final fallback - sport-specific generic images
     const sportImages: Record<string, string> = {
@@ -133,82 +119,169 @@ export const getSportGradient = (category: string): string => {
     return gradientMap[category.toLowerCase()] || gradientMap.default;
 };
 
+// --- MOCK DATA GENERATOR ---
+
+// Helper to get time relative to now
+const getRelativeTime = (params: { hours?: number; minutes?: number }) => {
+    const now = new Date();
+    if (params.hours) now.setHours(now.getHours() + params.hours);
+    if (params.minutes) now.setMinutes(now.getMinutes() + params.minutes);
+    return now.getTime();
+};
+
+const generateMockMatches = (): Match[] => [
+    {
+        id: 'match-1',
+        title: 'Real Madrid vs Barcelona',
+        category: 'football',
+        date: getRelativeTime({ minutes: -45 }),
+        popular: true,
+        teams: {
+            home: { name: 'Real Madrid', badge: 'Real Madrid' },
+            away: { name: 'Barcelona', badge: 'Barcelona' }
+        },
+        sources: [{ source: 'streamed', id: 'rm-vs-barca' }]
+    },
+    {
+        id: 'match-2',
+        title: 'Lakers vs Warriors',
+        category: 'basketball',
+        date: getRelativeTime({ minutes: -20 }),
+        popular: true,
+        teams: {
+            home: { name: 'Lakers', badge: 'Lakers' },
+            away: { name: 'Warriors', badge: 'Warriors' }
+        },
+        sources: [{ source: 'streamed', id: 'lakers-warriors' }]
+    },
+    {
+        id: 'match-3',
+        title: 'Man City vs Arsenal',
+        category: 'football',
+        date: getRelativeTime({ minutes: 15 }),
+        popular: true,
+        teams: {
+            home: { name: 'Man City', badge: 'Man City' },
+            away: { name: 'Arsenal', badge: 'Arsenal' }
+        },
+        sources: [{ source: 'streamed', id: 'mancity-arsenal' }]
+    },
+    {
+        id: 'match-4',
+        title: 'Ferrari vs Red Bull',
+        category: 'f1',
+        date: getRelativeTime({ minutes: -60 }),
+        popular: true,
+        teams: {
+            home: { name: 'Ferrari', badge: 'Ferrari' },
+            away: { name: 'Red Bull', badge: 'Red Bull' }
+        },
+        sources: [{ source: 'streamed', id: 'f1-gp' }]
+    },
+    {
+        id: 'match-5',
+        title: 'PSG vs Marseille',
+        category: 'football',
+        date: getRelativeTime({ minutes: 5 }),
+        popular: false,
+        teams: {
+            home: { name: 'PSG', badge: 'PSG' },
+            away: { name: 'Marseille', badge: 'Marseille' }
+        },
+        sources: [{ source: 'streamed', id: 'psg-om' }]
+    },
+    {
+        id: 'match-6',
+        title: 'UFC 300: Main Event',
+        category: 'mma',
+        date: getRelativeTime({ minutes: -90 }),
+        popular: true,
+        teams: {
+            home: { name: 'Pereira', badge: 'ufc' },
+            away: { name: 'Hill', badge: 'ufc' }
+        },
+        sources: [{ source: 'streamed', id: 'ufc-300' }]
+    }
+];
+
+// --- CLIENT-SIDE SERVICE FUNCTIONS ---
+
 /**
- * Get currently live matches
+ * Get currently live matches (Mock)
  */
 export const getLiveMatches = async (): Promise<Match[]> => {
-    try {
-        const response = await streamedApi.get('/matches/live');
-        return response.data || [];
-    } catch (error) {
-        console.error('Error fetching live matches:', error);
-        return [];
-    }
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    // Return mock data directly
+    const matches = generateMockMatches();
+    // Logic: Matches that started recently or fit the "Live" criteria
+    return matches.filter(m => m.date <= Date.now() + 1000 * 60 * 15);
 };
 
 /**
- * Get today's matches
+ * Get today's matches (Mock)
  */
 export const getTodaysMatches = async (): Promise<Match[]> => {
-    try {
-        const response = await streamedApi.get('/matches/all-today');
-        return response.data || [];
-    } catch (error) {
-        console.error("Error fetching today's matches:", error);
-        return [];
-    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return generateMockMatches();
 };
 
 /**
- * Get popular matches across all sports
+ * Get popular matches (Mock)
  */
 export const getPopularMatches = async (): Promise<Match[]> => {
-    try {
-        const response = await streamedApi.get('/matches/all/popular');
-        return response.data || [];
-    } catch (error) {
-        console.error('Error fetching popular matches:', error);
-        return [];
-    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+    return generateMockMatches().filter(m => m.popular);
 };
 
 /**
- * Get matches for a specific sport
+ * Get matches for a specific sport (Mock)
  */
 export const getMatchesBySport = async (sport: string): Promise<Match[]> => {
-    try {
-        const response = await streamedApi.get(`/matches/${sport}`);
-        return response.data || [];
-    } catch (error) {
-        console.error(`Error fetching ${sport} matches:`, error);
-        return [];
-    }
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const matches = generateMockMatches();
+    if (sport === 'all') return matches;
+    return matches.filter(m => m.category === sport);
 };
 
 /**
- * Get stream links for a specific match source
+ * Get stream links for a specific match source (Mock)
  */
 export const getStreams = async (source: string, id: string): Promise<Stream[]> => {
-    try {
-        const response = await streamedApi.get(`/stream/${source}/${id}`);
-        return response.data || [];
-    } catch (error) {
-        console.error('Error fetching streams:', error);
-        return [];
-    }
+    await new Promise(resolve => setTimeout(resolve, 800));
+    return [
+        {
+            id: 'stream-1',
+            streamNo: 1,
+            language: 'English',
+            hd: true,
+            embedUrl: 'https://vidsrc.to/embed/movie/385687', // Placeholder stream
+            source: 'mock'
+        },
+        {
+            id: 'stream-2',
+            streamNo: 2,
+            language: 'Spanish',
+            hd: true,
+            embedUrl: 'https://vidsrc.to/embed/movie/385687', // Placeholder stream
+            source: 'mock'
+        }
+    ];
 };
 
 /**
  * Get all available sport categories
  */
 export const getSportCategories = async (): Promise<Sport[]> => {
-    try {
-        const response = await streamedApi.get('/sports');
-        return response.data || [];
-    } catch (error) {
-        console.error('Error fetching sport categories:', error);
-        return [];
-    }
+    return [
+        { id: 'football', name: 'Football' },
+        { id: 'basketball', name: 'Basketball' },
+        { id: 'hockey', name: 'Hockey' },
+        { id: 'tennis', name: 'Tennis' },
+        { id: 'f1', name: 'Formula 1' },
+        { id: 'mma', name: 'MMA/UFC' }
+    ];
 };
 
 /**
