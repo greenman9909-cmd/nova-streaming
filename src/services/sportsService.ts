@@ -188,7 +188,7 @@ export const getMatchesBySport = async (sport: string): Promise<Match[]> => {
 /**
  * Get stream links for a specific match source (Mock)
  */
-export const getStreams = async (source: string, id: string): Promise<Stream[]> => {
+export const getStreams = async (_source: string, id: string): Promise<Stream[]> => {
     await new Promise(resolve => setTimeout(resolve, 800));
 
     // Return appropriate highlights based on ID context (mock logic)
