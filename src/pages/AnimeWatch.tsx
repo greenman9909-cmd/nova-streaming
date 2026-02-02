@@ -13,7 +13,7 @@ import EnhancedPlayer from '../components/EnhancedPlayer';
 
 export default function AnimeWatch() {
     const { id } = useParams<{ id: string }>();
-    const [searchParams] = useSearchParams();
+    // const [searchParams] = useSearchParams();
 
     const [anime, setAnime] = useState<AnimeResult | null>(null);
     const [episodes, setEpisodes] = useState<Episode[]>([]);
